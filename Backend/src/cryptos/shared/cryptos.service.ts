@@ -12,7 +12,9 @@ export class CryptosService {
   }
 
   async getCryptoData(cryptos: Cryptos) {
-    const url = `https://api.binance.com/api/v3/klines?symbol=${cryptos.symbol}&interval=${cryptos.interval}&limit=${cryptos.limit}`;
+    const url = `https://api.binance.com/api/v3/klines?symbol=${cryptos.symbol.toUpperCase()}&interval=${
+      cryptos.interval
+    }&limit=${cryptos.limit}`;
     console.log(url);
 
     const result = await this.httpService.get(url).toPromise();
