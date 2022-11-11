@@ -6,6 +6,11 @@ import { Injectable } from '@nestjs/common';
 export class CryptosService {
   constructor(private readonly httpService: HttpService) {}
 
+  getHelloFront(): string {
+    console.log('Get Data received');
+    return 'Hello Frontend!';
+  }
+
   async getCryptoData(cryptos: Cryptos) {
     const url = `https://api.binance.com/api/v3/klines?symbol=${cryptos.symbol}&interval=${cryptos.interval}&limit=${cryptos.limit}`;
     console.log(url);

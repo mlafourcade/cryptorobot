@@ -1,5 +1,6 @@
 import { Box, Stack } from "@mui/material";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
+import { getCandles } from "../../services/DataService";
 import { AChart } from "../apexcharts";
 import { Canvas, CanvasJsMenuArea, CanvasJsWindowArea } from "../canvasjschart";
 import { FooterArea } from "../Template/footer";
@@ -14,6 +15,24 @@ interface NavProps {
 }
 
 export const BodyArea: FC<NavProps> = ({ children }) => {
+  type dataChart = {
+    x: Date;
+    y: [number, number, number, number];
+  };
+
+  const dataProps: dataChart[] = [];
+
+  const [data, setdata] = useState(dataProps);
+
+  useEffect(() => {
+    console.log("useEfect");
+    getCandles("XLMUSDT", "5m", 250)
+      .then((value: any) => setdata(value))
+      .catch((err) => alert(err.response ? err.response.data : err.message));
+  }, []);
+
+  console.log("Dados = ", data);
+
   return (
     <Box width="100vw" height="100vh">
       <Stack direction={"column"}>
@@ -27,7 +46,7 @@ export const BodyArea: FC<NavProps> = ({ children }) => {
                 <WindowArea>
                   <CanvasJsMenuArea>Chart Menu</CanvasJsMenuArea>
                   <CanvasJsWindowArea>
-                    <AChart />
+                    <AChart data={data} />
                   </CanvasJsWindowArea>
                 </WindowArea>
               </Stack>

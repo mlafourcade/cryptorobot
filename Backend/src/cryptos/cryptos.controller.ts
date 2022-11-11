@@ -6,11 +6,10 @@ import { CryptosService } from './shared/cryptos.service';
 export class CryptosController {
   constructor(private readonly cryptosService: CryptosService) {}
 
-  /*@Get()
-  async getCryptos() {
-    return await this.cryptosService.getCryptos();
-  }*/
-
+  @Get()
+  getHello(): string {
+    return this.cryptosService.getHelloFront();
+  }
   @Post()
   async getCryptoData(@Body() cryptos: Cryptos): Promise<JSON> {
     return this.cryptosService.getCryptoData(cryptos);
