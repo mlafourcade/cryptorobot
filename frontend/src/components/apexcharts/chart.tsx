@@ -11,8 +11,6 @@ type DataProps = {
 };
 
 export const AChart = (props: DataProps) => {
-  console.log("Props aqui = ", props.data);
-
   const options: ApexOptions = {
     xaxis: {
       type: "datetime",
@@ -20,6 +18,16 @@ export const AChart = (props: DataProps) => {
     yaxis: {
       tooltip: {
         enabled: true,
+      },
+    },
+    theme: {
+      mode: "dark",
+      palette: "palette9",
+      monochrome: {
+        enabled: false,
+        color: "#2a2a2a",
+        shadeTo: "dark",
+        shadeIntensity: 0.65,
       },
     },
   };

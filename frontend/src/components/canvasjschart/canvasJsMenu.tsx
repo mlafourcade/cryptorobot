@@ -25,7 +25,7 @@ export const CanvasJsMenuArea = () => {
         width="100%"
         height="100%"
         sx={{
-          background: "#2a2a2a",
+          background: "#424242",
           color: "white",
           display: { xs: "none", sm: "block" },
         }}
