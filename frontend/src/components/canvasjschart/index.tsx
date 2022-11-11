@@ -1,3 +1,4 @@
 export * from "./stockChart";
-export * from "./canvasJsWindow";
+export * from "./canvasJsChart";
 export * from "./canvasJsMenu";
+export * from "./canvasJsWindow";

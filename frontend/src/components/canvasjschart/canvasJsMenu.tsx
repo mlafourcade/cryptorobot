@@ -1,11 +1,24 @@
 import { Box, Grid } from "@mui/material";
-import { FC, ReactNode } from "react";
+import { ChangeEvent } from "react";
+import { useContextChart } from "./canvasJsWindow";
 
-interface CMenuProps {
-  children?: ReactNode;
-}
+export const CanvasJsMenuArea = () => {
+  const { handleSymbol } = useContextChart();
+  const { handleInterval } = useContextChart();
+  const { handleLimit } = useContextChart();
 
-export const CanvasJsMenuArea: FC<CMenuProps> = ({ children }) => {
+  function onSymbolChange(event: ChangeEvent<HTMLSelectElement>) {
+    handleSymbol(event.target.value);
+  }
+
+  function onIntervalChange(event: ChangeEvent<HTMLSelectElement>) {
+    handleInterval(event.target.value);
+  }
+
+  function onLimitChange(event: ChangeEvent<HTMLSelectElement>) {
+    handleLimit(parseInt(event.target.value));
+  }
+
   return (
     <Grid container height="6vh" width="75vw">
       <Box
@@ -17,7 +30,24 @@ export const CanvasJsMenuArea: FC<CMenuProps> = ({ children }) => {
           display: { xs: "none", sm: "block" },
         }}
       >
-        {children}
+        <select onChange={onSymbolChange}>
+          <option>BTCUSDT</option>
+          <option>ETHUSDT</option>
+          <option>ADAUSDT</option>
+          <option selected={true}>XLMUSDT</option>
+        </select>
+        <select onChange={onIntervalChange}>
+          <option>1d</option>
+          <option>1h</option>
+          <option>15m</option>
+          <option selected={true}>5m</option>
+        </select>
+        <select onChange={onLimitChange}>
+          <option>20</option>
+          <option selected={true}>50</option>
+          <option>100</option>
+          <option>250</option>
+        </select>
       </Box>
     </Grid>
   );

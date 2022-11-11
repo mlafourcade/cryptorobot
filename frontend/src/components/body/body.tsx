@@ -2,7 +2,12 @@ import { Box, Stack } from "@mui/material";
 import { FC, ReactNode, useEffect, useState } from "react";
 import { getCandles } from "../../services/DataService";
 import { AChart } from "../apexcharts";
-import { Canvas, CanvasJsMenuArea, CanvasJsWindowArea } from "../canvasjschart";
+import {
+  Canvas,
+  CanvasJsMenuArea,
+  CanvasJsWindowArea,
+  CanvasJsWindowChartArea,
+} from "../canvasjschart";
 import { FooterArea } from "../Template/footer";
 import { MenuArea } from "../Template/menu";
 import { NavBarArea } from "../Template/navbar";
@@ -15,24 +20,6 @@ interface NavProps {
 }
 
 export const BodyArea: FC<NavProps> = ({ children }) => {
-  type dataChart = {
-    x: Date;
-    y: [number, number, number, number];
-  };
-
-  const dataProps: dataChart[] = [];
-
-  const [data, setdata] = useState(dataProps);
-
-  useEffect(() => {
-    console.log("useEfect");
-    getCandles("XLMUSDT", "5m", 250)
-      .then((value: any) => setdata(value))
-      .catch((err) => alert(err.response ? err.response.data : err.message));
-  }, []);
-
-  console.log("Dados = ", data);
-
   return (
     <Box width="100vw" height="100vh">
       <Stack direction={"column"}>
@@ -44,9 +31,9 @@ export const BodyArea: FC<NavProps> = ({ children }) => {
             <Stack direction={"row"}>
               <Stack direction={"column"}>
                 <WindowArea>
-                  <CanvasJsMenuArea>Chart Menu</CanvasJsMenuArea>
                   <CanvasJsWindowArea>
-                    <AChart data={data} />
+                    <CanvasJsMenuArea />
+                    <CanvasJsWindowChartArea />
                   </CanvasJsWindowArea>
                 </WindowArea>
               </Stack>
