@@ -34,17 +34,17 @@ export const CanvasJsMenuArea = () => {
           <option>BTCUSDT</option>
           <option>ETHUSDT</option>
           <option>ADAUSDT</option>
-          <option selected={true}>XLMUSDT</option>
+          <option>XLMUSDT</option>
         </select>
         <select onChange={onIntervalChange}>
           <option>1d</option>
           <option>1h</option>
           <option>15m</option>
-          <option selected={true}>5m</option>
+          <option>5m</option>
         </select>
         <select onChange={onLimitChange}>
           <option>20</option>
-          <option selected={true}>50</option>
+          <option>50</option>
           <option>100</option>
           <option>250</option>
         </select>
