@@ -3,6 +3,19 @@ export type dataChart = {
   y: [number, number, number, number];
 };
 
+export type dataLineChart = {
+  x: Date;
+  y: number;
+};
+
+export type dataChartArray = {
+  dataPoints: dataChart[];
+  dataPointsV: dataLineChart[];
+  dataPointsMA: dataLineChart[];
+  dataPointsBolU: dataLineChart[];
+  dataPointsBolD: dataLineChart[];
+};
+
 export class Candle {
   x: Date;
   y: [number, number, number, number];
