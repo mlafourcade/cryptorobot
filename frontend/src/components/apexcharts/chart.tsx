@@ -291,7 +291,7 @@ export const AChart = (props: dataChartArrayProps) => {
         enabled: false,
       },
     },
-    //colors: ["#77B6EA", "#77B6EA", "#E1AAF1", "#E1AAF1"],
+    colors: ["#77B6EA", "#77B6EA", "#E1AAF1", "#E1AAF1"],
     title: {
       text: "CandleStick Chart",
       align: "left",
@@ -312,12 +312,22 @@ export const AChart = (props: dataChartArrayProps) => {
         enabled: true,
       },
     },
+    theme: {
+      mode: "dark",
+      palette: "palette9",
+      monochrome: {
+        enabled: false,
+        color: "#2a2a2a",
+        shadeTo: "dark",
+        shadeIntensity: 0.65,
+      },
+    },
   };
 
   const seriesBar: ApexAxisChartSeries = [
     {
       name: "volume",
-      data: dataTeste2,
+      data: props.data.dataPointsV,
     },
   ];
 

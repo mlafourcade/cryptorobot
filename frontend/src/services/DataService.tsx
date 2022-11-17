@@ -16,7 +16,7 @@ export async function getCandles(
       limit: candleLimit,
     })
     .then(function (response) {
-      console.log(response.data);
+      //console.log(response.data);
       ret = response.data;
     })
     .catch(function (error) {
