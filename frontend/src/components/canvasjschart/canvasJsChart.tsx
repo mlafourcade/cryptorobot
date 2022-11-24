@@ -4,9 +4,9 @@ import { getCandles } from "../../services/DataService";
 import { AChart } from "../apexcharts";
 import { useContextChart } from "./canvasJsWindow";
 import useWebSocket from "react-use-websocket";
-import { Candle, dataChart, dataChartArray, dataLineChart } from "./cryptos";
+import { Candle, DataChartArray, DataLineChart } from "./cryptos";
 
-let AuxMAdataPoints: dataLineChart[] = [];
+let AuxMAdataPoints: DataLineChart[] = [];
 
 async function delayMA(time: number) {
   return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ async function MAcalcule(
   ClosePrice: number,
   index: number,
   vmedia: number
-): Promise<dataLineChart> {
+): Promise<DataLineChart> {
   return new Promise(async (resolve, reject) => {
     AuxMAdataPoints.push({
       x: date,
@@ -42,7 +42,7 @@ async function MAcalcule(
       }
       var CalcMedia = sum / vmedia;
 
-      let CalcMAValue: dataLineChart = {
+      let CalcMAValue: DataLineChart = {
         x: date,
         y: parseFloat(CalcMedia.toFixed(6)),
       };
@@ -84,12 +84,12 @@ function BollingerUpCalcule(
   axisX: Date,
   madata: number,
   sddata: number
-): Promise<dataLineChart> {
+): Promise<DataLineChart> {
   return new Promise((resolve, reject) => {
     let cal1 = sddata * 2;
     let calculeup = madata + cal1;
 
-    let CalcSDValue: dataLineChart = {
+    let CalcSDValue: DataLineChart = {
       x: axisX,
       y: parseFloat(calculeup.toFixed(5)),
     };
@@ -102,12 +102,12 @@ function BollingerDownCalcule(
   axisX: Date,
   madata: number,
   sddata: number
-): Promise<dataLineChart> {
+): Promise<DataLineChart> {
   return new Promise((resolve, reject) => {
     let cal1 = sddata * 2;
     let calculedown = madata - cal1;
 
-    let CalcSDValue: dataLineChart = {
+    let CalcSDValue: DataLineChart = {
       x: axisX,
       y: parseFloat(calculedown.toFixed(5)),
     };
@@ -141,25 +141,23 @@ type BinanceFormat = {
   s: string;
 };
 
+const initialDataState: DataChartArray = {
+  dataPoints: [],
+  dataPointsV: [],
+  dataPointsMA: [],
+  dataPointsBolU: [],
+  dataPointsBolD: [],
+};
+
 export const CanvasJsWindowChartArea = () => {
-  const { symbol } = useContextChart();
-  const { interval } = useContextChart();
-  const { limit } = useContextChart();
+  const { symbol, interval, limit } = useContextChart();
 
-  const dataProps: dataChartArray = {
-    dataPoints: [],
-    dataPointsV: [],
-    dataPointsMA: [],
-    dataPointsBolU: [],
-    dataPointsBolD: [],
-  };
-
-  const [data, setData] = useState(dataProps);
+  const [data, setData] = useState(initialDataState);
 
   useEffect(() => {
     getCandles(symbol, interval, limit)
       .then(async (value: any) => {
-        const dataPointsArray: dataChartArray = {
+        const dataPointsArray: DataChartArray = {
           dataPoints: value,
           dataPointsV: [],
           dataPointsMA: [],
@@ -206,10 +204,103 @@ export const CanvasJsWindowChartArea = () => {
             .catch(() => {});
         }
         setData(dataPointsArray);
-        // console.log("Waiting looping");
       })
       .catch((err) => alert(err.response ? err.response.data : err.message));
   }, [symbol, interval, limit]);
+
+  const { lastJsonMessage } = useWebSocket(
+    `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`,
+    {
+      onOpen: () => console.log(`Connected to App WS`),
+      onMessage: async () => {
+        if (lastJsonMessage) {
+          const DataBinance = lastJsonMessage as BinanceFormat;
+          const CurrentlyDate = new Date(DataBinance.k.t);
+          const newCandle = new Candle(
+            CurrentlyDate,
+            DataBinance.k.o,
+            DataBinance.k.h,
+            DataBinance.k.l,
+            DataBinance.k.c,
+            DataBinance.k.v
+          );
+
+          const newDataArray: DataChartArray = {
+            dataPoints: [...data.dataPoints],
+            dataPointsBolD: [...data.dataPointsBolD],
+            dataPointsBolU: [...data.dataPointsBolU],
+            dataPointsMA: [...data.dataPointsMA],
+            dataPointsV: [...data.dataPointsV],
+          };
+
+          //candle incompleto
+          if (DataBinance.k.x === false) {
+            //substitui último candle pela versão atualizada
+            newDataArray.dataPoints[newDataArray.dataPoints.length - 1] =
+              newCandle;
+            newDataArray.dataPointsV[newDataArray.dataPointsV.length - 1] = {
+              x: CurrentlyDate,
+              y: parseInt(DataBinance.k.v),
+            };
+          } else {
+            //remove primeiro candle e adiciona o novo último
+            newDataArray.dataPoints.push(newCandle);
+            newDataArray.dataPoints.shift();
+            newDataArray.dataPointsV.push({
+              x: CurrentlyDate,
+              y: parseInt(DataBinance.k.v),
+            });
+            newDataArray.dataPointsV.shift();
+          }
+
+          AuxMAdataPoints.length = 0;
+          newDataArray.dataPointsMA.length = 0;
+          newDataArray.dataPointsBolU.length = 0;
+          newDataArray.dataPointsBolD.length = 0;
+
+          for (let i = 0; i < newDataArray.dataPoints.length; i++) {
+            await MAcalcule(
+              newDataArray.dataPoints[i].x,
+              newDataArray.dataPoints[i].y[3],
+              i,
+              20
+            )
+              .then(async (maresult) => {
+                newDataArray.dataPointsMA.push(maresult);
+                await SDcalcule(20, maresult.y)
+                  .then(async (sdresult) => {
+                    await BollingerUpCalcule(
+                      newDataArray.dataPoints[i].x,
+                      maresult.y,
+                      sdresult
+                    )
+                      .then(async (buresult) => {
+                        newDataArray.dataPointsBolU.push(buresult);
+                      })
+                      .catch(() => {});
+                    await BollingerDownCalcule(
+                      newDataArray.dataPoints[i].x,
+                      maresult.y,
+                      sdresult
+                    )
+                      .then(async (bdresult) => {
+                        newDataArray.dataPointsBolD.push(bdresult);
+                      })
+                      .catch(() => {});
+                  })
+                  .catch(() => {});
+              })
+              .catch(() => {});
+          }
+
+          setData(newDataArray);
+        }
+      },
+      onError: (event: any) => console.error(event),
+      shouldReconnect: (closeEvent) => true,
+      reconnectInterval: 3000,
+    }
+  );
 
   return (
     <Grid container height="75.4vh" width="74.9vw">

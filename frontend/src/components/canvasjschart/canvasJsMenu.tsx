@@ -1,23 +1,28 @@
 import { Box, Grid } from "@mui/material";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useCallback } from "react";
 import { useContextChart } from "./canvasJsWindow";
 
 export const CanvasJsMenuArea = () => {
-  const { handleSymbol } = useContextChart();
-  const { handleInterval } = useContextChart();
-  const { handleLimit } = useContextChart();
+  const { handleSymbol, handleLimit, handleInterval } = useContextChart();
 
-  function onSymbolChange(event: ChangeEvent<HTMLSelectElement>) {
-    handleSymbol(event.target.value);
-  }
-
-  function onIntervalChange(event: ChangeEvent<HTMLSelectElement>) {
-    handleInterval(event.target.value);
-  }
-
-  function onLimitChange(event: ChangeEvent<HTMLSelectElement>) {
-    handleLimit(parseInt(event.target.value));
-  }
+  const onSymbolChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      handleSymbol(event.target.value);
+    },
+    [handleSymbol]
+  );
+  const onIntervalChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      handleInterval(event.target.value);
+    },
+    [handleInterval]
+  );
+  const onLimitChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      handleLimit(parseInt(event.target.value));
+    },
+    [handleLimit]
+  );
 
   return (
     <Grid container height="6vh" width="75vw">
@@ -30,23 +35,23 @@ export const CanvasJsMenuArea = () => {
           display: { xs: "none", sm: "block" },
         }}
       >
-        <select onChange={onSymbolChange}>
-          <option>BTCUSDT</option>
-          <option>ETHUSDT</option>
-          <option>ADAUSDT</option>
-          <option>XLMUSDT</option>
+        <select onChange={onSymbolChange} defaultValue="XLMUSDT">
+          <option value="BTCUSDT">BTCUSDT</option>
+          <option value="ETHUSDT">ETHUSDT</option>
+          <option value="ADAUSDT">ADAUSDT</option>
+          <option value="XLMUSDT">XLMUSDT</option>
         </select>
-        <select onChange={onIntervalChange}>
-          <option>1d</option>
-          <option>1h</option>
-          <option>15m</option>
-          <option>5m</option>
+        <select onChange={onIntervalChange} defaultValue="5m">
+          <option value="1d">1d</option>
+          <option value="1h">1h</option>
+          <option value="15m">15m</option>
+          <option value="5m">5m</option>
         </select>
-        <select onChange={onLimitChange}>
-          <option>20</option>
-          <option>50</option>
-          <option>100</option>
-          <option>250</option>
+        <select onChange={onLimitChange} defaultValue="50">
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="250">250</option>
         </select>
       </Box>
     </Grid>

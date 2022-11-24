@@ -1,24 +1,26 @@
-export type dataChart = {
+export type CandleY = [number, number, number, number];
+
+export type DataChart = {
   x: Date;
-  y: [number, number, number, number];
+  y: CandleY;
 };
 
-export type dataLineChart = {
+export type DataLineChart = {
   x: Date;
   y: number;
 };
 
-export type dataChartArray = {
-  dataPoints: dataChart[];
-  dataPointsV: dataLineChart[];
-  dataPointsMA: dataLineChart[];
-  dataPointsBolU: dataLineChart[];
-  dataPointsBolD: dataLineChart[];
+export type DataChartArray = {
+  dataPoints: DataChart[];
+  dataPointsV: DataLineChart[];
+  dataPointsMA: DataLineChart[];
+  dataPointsBolU: DataLineChart[];
+  dataPointsBolD: DataLineChart[];
 };
 
 export class Candle {
   x: Date;
-  y: [number, number, number, number];
+  y: CandleY;
   v: number;
   constructor(
     openTime: Date,

@@ -5,6 +5,7 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  PropsWithChildren,
   useState,
 } from "react";
 
@@ -24,25 +25,15 @@ export const useContextChart = () => {
 };
 
 interface CWindowProps {
-  children?: ReactNode;
+  //
 }
 
-export const CanvasJsWindowArea: FC<CWindowProps> = ({ children }) => {
+export const CanvasJsWindowArea = ({
+  children,
+}: PropsWithChildren<CWindowProps>) => {
   const [symbol, setSymbol] = useState("XLMUSDT");
   const [interval, setInterval] = useState("5m");
   const [limit, setLimit] = useState(50);
-
-  const handleSymbol = useCallback((symbol: string) => {
-    setSymbol(symbol);
-  }, []);
-
-  const handleInterval = useCallback((interval: string) => {
-    setInterval(interval);
-  }, []);
-
-  const handleLimit = useCallback((limit: number) => {
-    setLimit(limit);
-  }, []);
 
   return (
     <Grid container height="81.4vh" width="74.9vw">
@@ -58,9 +49,9 @@ export const CanvasJsWindowArea: FC<CWindowProps> = ({ children }) => {
             symbol,
             interval,
             limit,
-            handleSymbol,
-            handleInterval,
-            handleLimit,
+            handleSymbol: setSymbol,
+            handleInterval: setInterval,
+            handleLimit: setLimit,
           }}
         >
           {children}

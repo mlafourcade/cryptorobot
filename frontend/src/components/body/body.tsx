@@ -8,6 +8,7 @@ import {
   CanvasJsWindowArea,
   CanvasJsWindowChartArea,
 } from "../canvasjschart";
+import { Currently } from "../Cards/currently";
 import { FooterArea } from "../Template/footer";
 import { MenuArea } from "../Template/menu";
 import { NavBarArea } from "../Template/navbar";
@@ -27,7 +28,9 @@ export const BodyArea: FC<NavProps> = ({ children }) => {
         <Stack direction={"row"}>
           <SideBarArea>Side Bar</SideBarArea>
           <Stack direction={"column"}>
-            <MenuArea>Menu</MenuArea>
+            <MenuArea>
+              <Currently />
+            </MenuArea>
             <Stack direction={"row"}>
               <Stack direction={"column"}>
                 <WindowArea>
