@@ -1,10 +1,10 @@
 //import { createMuiTheme } from '@mui/core/styles';
 //import indigo from '@mui/material/colors/indigo';
-import { cyan, yellow, blue } from '@mui/material/colors';
+import { cyan, yellow, blue } from "@mui/material/colors";
 //import { createMuiTheme } from '@mui/material/styles';
-import { createTheme } from '@mui/material';
+import { createTheme } from "@mui/material";
 
-export const theme = createTheme({
+/*export const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
@@ -29,7 +29,7 @@ export const theme = createTheme({
       color: 'white',
     },
   },
-});
+});*/
 
 /*const theme = createMuiTheme({
   palette: {

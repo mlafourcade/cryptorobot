@@ -1,45 +1,8 @@
 import { alpha, createTheme, darken } from "@mui/material";
-import { cyan, yellow } from "@mui/material/colors";
-
-// export const LightTheme = createTheme({
-//   palette: {
-//     primary: {
-//       main: yellow[700],
-//       dark: yellow[800],
-//       light: yellow[500],
-//       contrastText: '#ffffff',
-//     },
-//     secondary: {
-//       main: cyan[500],
-//       dark: cyan[400],
-//       light: cyan[300],
-//       contrastText: '#ffffff',
-//     },
-//     background: {
-//       paper: '#ffffff',
-//       default: '#f7f6f3',
-//     },
-//   },
-//   typography: {
-//     h4: {
-//       fontSize: 11,
-//       color: '#4F4F4F',
-//     },
-//     h5: {
-//       fontSize: 11,
-//       color: '#4F4F4F',
-//     },
-//   },
-// });
+import "@mui/lab/themeAugmentation";
 
 const themeColors = {
-  primary: {
-    main: yellow[700],
-    dark: yellow[800],
-    light: yellow[500],
-    lighter: yellow[200],
-    contrastText: "#ffffff",
-  },
+  primary: "#8C7CF0",
   secondary: "#9EA4C1",
   success: "#44D600",
   warning: "#FFA319",
@@ -129,10 +92,10 @@ const colors = {
     dark: darken(themeColors.secondary, 0.2),
   },
   primary: {
-    lighter: themeColors.primary.lighter,
-    light: themeColors.primary.light,
-    main: themeColors.primary.main,
-    dark: themeColors.primary.dark,
+    lighter: alpha(themeColors.primary, 0.85),
+    light: alpha(themeColors.primary, 0.3),
+    main: themeColors.primary,
+    dark: darken(themeColors.primary, 0.2),
   },
   success: {
     lighter: alpha(themeColors.success, 0.85),
@@ -160,7 +123,8 @@ const colors = {
   },
 };
 
-export const LightTheme = createTheme({
+export const NebulaFighterTheme = createTheme({
+  // direction: i18n.dir(),
   colors: {
     gradients: {
       blue1: colors.gradients.blue1,
@@ -213,10 +177,10 @@ export const LightTheme = createTheme({
       dark: darken(themeColors.secondary, 0.2),
     },
     primary: {
-      lighter: themeColors.primary.lighter,
-      light: themeColors.primary.light,
-      main: themeColors.primary.main,
-      dark: themeColors.primary.dark,
+      lighter: alpha(themeColors.primary, 0.1),
+      light: alpha(themeColors.primary, 0.3),
+      main: themeColors.primary,
+      dark: darken(themeColors.primary, 0.2),
     },
     success: {
       lighter: alpha(themeColors.success, 0.1),
