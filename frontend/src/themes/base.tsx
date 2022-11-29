@@ -90,6 +90,18 @@ declare module "@mui/material/styles" {
         main: string;
         dark: string;
       };
+      high: {
+        lighter: string;
+        light: string;
+        main: string;
+        dark: string;
+      };
+      low: {
+        lighter: string;
+        light: string;
+        main: string;
+        dark: string;
+      };
     };
     general: {
       reactFrameworkColor: React.CSSProperties["color"];
@@ -197,6 +209,18 @@ declare module "@mui/material/styles" {
         dark: string;
       };
       info: {
+        lighter: string;
+        light: string;
+        main: string;
+        dark: string;
+      };
+      high: {
+        lighter: string;
+        light: string;
+        main: string;
+        dark: string;
+      };
+      low: {
         lighter: string;
         light: string;
         main: string;

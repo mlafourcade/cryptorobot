@@ -12,6 +12,8 @@ const themeColors = {
   white: "#111633",
   primaryAlt: "#111633",
   trueWhite: "#ffffff",
+  high: "#00B746",
+  low: "#EF403C",
 };
 
 const colors = {
@@ -121,6 +123,18 @@ const colors = {
     main: themeColors.info,
     dark: darken(themeColors.info, 0.2),
   },
+  high: {
+    lighter: alpha(themeColors.high, 0.85),
+    light: alpha(themeColors.high, 0.3),
+    main: themeColors.high,
+    dark: alpha(themeColors.high, 0.2),
+  },
+  low: {
+    lighter: alpha(themeColors.low, 0.85),
+    light: alpha(themeColors.low, 0.3),
+    main: themeColors.low,
+    dark: alpha(themeColors.low, 0.2),
+  },
 };
 
 export const NebulaFighterTheme = createTheme({
@@ -205,6 +219,18 @@ export const NebulaFighterTheme = createTheme({
       light: alpha(themeColors.info, 0.3),
       main: themeColors.info,
       dark: darken(themeColors.info, 0.2),
+    },
+    high: {
+      lighter: alpha(themeColors.high, 0.1),
+      light: alpha(themeColors.high, 0.3),
+      main: themeColors.high,
+      dark: alpha(themeColors.high, 0.2),
+    },
+    low: {
+      lighter: alpha(themeColors.low, 0.1),
+      light: alpha(themeColors.low, 0.3),
+      main: themeColors.low,
+      dark: alpha(themeColors.low, 0.2),
     },
   },
 

@@ -150,7 +150,14 @@ const initialDataState: DataChartArray = {
 };
 
 export const CanvasJsWindowChartArea = () => {
-  const { symbol, interval, limit, handleCrypto } = useCryptoContext();
+  const {
+    symbol,
+    interval,
+    limit,
+    colorPrice,
+    handleCrypto,
+    toggleColorPrice,
+  } = useCryptoContext();
   const [data, setData] = useState(initialDataState);
 
   useEffect(() => {
@@ -202,10 +209,26 @@ export const CanvasJsWindowChartArea = () => {
             })
             .catch(() => {});
         }
+
+        const direction: number =
+          dataPointsArray.dataPoints[dataPointsArray.dataPoints.length - 1]
+            .y[3] -
+          dataPointsArray.dataPoints[dataPointsArray.dataPoints.length - 1]
+            .y[0];
+
+        console.log("direction = ", direction);
+
+        if (direction < 0) {
+          console.log("direction é menor que 0");
+        } else {
+          console.log("direction é maior que 0");
+        }
+
+        toggleColorPrice(direction < 0 ? "low" : "high");
         setData(dataPointsArray);
       })
       .catch((err) => alert(err.response ? err.response.data : err.message));
-  }, [symbol, interval, limit]);
+  }, [symbol, interval, limit, colorPrice, toggleColorPrice]);
 
   const { lastJsonMessage } = useWebSocket(
     `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`,
@@ -292,8 +315,25 @@ export const CanvasJsWindowChartArea = () => {
               .catch(() => {});
           }
 
-          setData(newDataArray);
           console.log("Close Price = ", DataBinance.k.c);
+          console.log("Open Price = ", DataBinance.k.o);
+
+          const direction: number =
+            parseFloat(DataBinance.k.c) - parseFloat(DataBinance.k.o);
+
+          console.log("direction = ", direction);
+
+          if (direction < 0) {
+            console.log("direction é menor que 0");
+          } else {
+            console.log("direction é maior que 0");
+          }
+
+          toggleColorPrice(direction < 0 ? "low" : "high");
+
+          console.log("Color Price = ", colorPrice);
+
+          setData(newDataArray);
           handleCrypto(parseFloat(DataBinance.k.c));
         }
       },

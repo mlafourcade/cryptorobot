@@ -106,7 +106,15 @@ const LinearProgressWrapper = styled(LinearProgress)(
 
 export const Currently = () => {
   const theme = useTheme();
-  const { crypto, symbol, handleCrypto } = useCryptoContext();
+  const { crypto, symbol, colorPrice, handleCrypto } = useCryptoContext();
+
+  const MyTypography = styled(Typography)({
+    color:
+      colorPrice === "high" ? theme.colors.high.main : theme.colors.low.main,
+    textAlign: "center",
+    fontSize: "0.875rem",
+    fontWeight: "700",
+  });
 
   return (
     <Stack
@@ -119,6 +127,8 @@ export const Currently = () => {
         <Box
           width="12vw"
           height="4.5vh"
+          //style={{ background: `${theme.colors.success.main}` }}
+          style={{ background: "darkCard" }}
           sx={{
             boxShadow: 30,
           }}
@@ -129,8 +139,12 @@ export const Currently = () => {
               textAlign: "center",
               fontSize: "0.875rem",
               fontWeight: "700",
+              color:
+                colorPrice === "high"
+                  ? theme.colors.high.main
+                  : theme.colors.low.main,
             }}
-            color="text.secondary"
+            color="success"
           >
             {symbol + " = " + crypto}
           </Typography>
@@ -138,7 +152,27 @@ export const Currently = () => {
       </Card>
       <Card>
         <Box width="12vw" height="4.5vh">
-          Outra coisa
+          <MyTypography>{symbol + " = " + colorPrice}</MyTypography>
+        </Box>
+      </Card>
+      <Card>
+        <Box width="12vw" height="4.5vh" color="theme.colors.success.main">
+          <Typography
+            sx={{
+              mb: 1.5,
+              textAlign: "center",
+              fontSize: "0.875rem",
+              fontWeight: "700",
+              color: theme.colors.success.main,
+              background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+              border: 0,
+              borderRadius: 3,
+              boxShadow: "0 3px 5px 2px rgba(255, 105, 135, .3)",
+              padding: "0 30px",
+            }}
+          >
+            Nova coisa
+          </Typography>
         </Box>
       </Card>
       <Card>
@@ -148,12 +182,17 @@ export const Currently = () => {
       </Card>
       <Card>
         <Box width="12vw" height="4.5vh">
-          Nova coisa
-        </Box>
-      </Card>
-      <Card>
-        <Box width="12vw" height="4.5vh">
-          Nova coisa
+          <Typography
+            sx={{
+              mb: 1.5,
+              textAlign: "center",
+              fontSize: "0.875rem",
+              fontWeight: "700",
+              color: "high",
+            }}
+          >
+            Nova coisa
+          </Typography>
         </Box>
       </Card>
       <Card>

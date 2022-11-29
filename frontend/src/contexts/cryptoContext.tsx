@@ -9,10 +9,12 @@ interface ICryptoContextValue {
   symbol: string;
   interval: string;
   limit: number;
+  colorPrice: "high" | "low";
   handleCrypto: (cvalue: number) => void;
   handleSymbol: (symbol: string) => void;
   handleInterval: (interval: string) => void;
   handleLimit: (limit: number) => void;
+  toggleColorPrice: (color: "high" | "low") => void;
 }
 
 const CryptoContext = createContext({} as ICryptoContextValue);
@@ -26,6 +28,7 @@ export const AppCryptoProvider: FC<CryptoProps> = ({ children }) => {
   const [symbol, setSymbol] = useState("XLMUSDT");
   const [interval, setInterval] = useState("5m");
   const [limit, setLimit] = useState(50);
+  const [colorPrice, setColorPrice] = useState<"high" | "low">("high");
 
   return (
     <CryptoContext.Provider
@@ -34,10 +37,12 @@ export const AppCryptoProvider: FC<CryptoProps> = ({ children }) => {
         symbol,
         interval,
         limit,
+        colorPrice,
         handleCrypto: setCrypto,
         handleSymbol: setSymbol,
         handleInterval: setInterval,
         handleLimit: setLimit,
+        toggleColorPrice: setColorPrice,
       }}
     >
       {children}
