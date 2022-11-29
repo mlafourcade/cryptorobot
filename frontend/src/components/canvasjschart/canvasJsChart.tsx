@@ -2,9 +2,9 @@ import { Box, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getCandles } from "../../services/DataService";
 import { AChart } from "../apexcharts";
-import { useContextChart } from "./canvasJsWindow";
 import useWebSocket from "react-use-websocket";
 import { Candle, DataChartArray, DataLineChart } from "./cryptos";
+import { useCryptoContext } from "../../contexts";
 
 let AuxMAdataPoints: DataLineChart[] = [];
 
@@ -150,8 +150,7 @@ const initialDataState: DataChartArray = {
 };
 
 export const CanvasJsWindowChartArea = () => {
-  const { symbol, interval, limit } = useContextChart();
-
+  const { symbol, interval, limit, handleCrypto } = useCryptoContext();
   const [data, setData] = useState(initialDataState);
 
   useEffect(() => {
@@ -294,6 +293,8 @@ export const CanvasJsWindowChartArea = () => {
           }
 
           setData(newDataArray);
+          console.log("Close Price = ", DataBinance.k.c);
+          handleCrypto(parseFloat(DataBinance.k.c));
         }
       },
       onError: (event: any) => console.error(event),

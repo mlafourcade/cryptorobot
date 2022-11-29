@@ -11,11 +11,13 @@ import {
   Grid,
   LinearProgress,
   Stack,
+  Theme,
   Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useCryptoContext } from "../../contexts";
 
 type Locale = {
   code?: string;
@@ -104,72 +106,58 @@ const LinearProgressWrapper = styled(LinearProgress)(
 
 export const Currently = () => {
   const theme = useTheme();
+  const { crypto, symbol, handleCrypto } = useCryptoContext();
+
   return (
     <Stack
       direction={"row"}
-      // spacing={{ xs: 1, sm: 2, md: 4 }}
       justifyContent="rigth"
       alignItems="center"
-      sx={{ gap: 0.4, p: 0.4 }}
+      sx={{ gap: "0.4%", p: "0.4%", boxShadow: 4, background: "#424242" }}
     >
       <Card>
         <Box
+          width="12vw"
+          height="4.5vh"
           sx={{
-            m: theme.spacing(0, 3.9, 1.4, 3.9),
-            //height: (theme) => theme.spacing(3.9),
-            //width: (theme) => theme.spacing(20.9),
+            boxShadow: 30,
           }}
         >
-          qualquer coisa!!
+          <Typography
+            sx={{
+              mb: 1.5,
+              textAlign: "center",
+              fontSize: "0.875rem",
+              fontWeight: "700",
+            }}
+            color="text.secondary"
+          >
+            {symbol + " = " + crypto}
+          </Typography>
         </Box>
       </Card>
       <Card>
-        <Box
-          sx={{
-            height: (theme) => theme.spacing(3.9),
-            width: (theme) => theme.spacing(20.9),
-          }}
-        >
+        <Box width="12vw" height="4.5vh">
           Outra coisa
         </Box>
       </Card>
       <Card>
-        <Box
-          sx={{
-            height: (theme) => theme.spacing(3.9),
-            width: (theme) => theme.spacing(20.9),
-          }}
-        >
+        <Box width="12vw" height="4.5vh">
           Nova coisa
         </Box>
       </Card>
       <Card>
-        <Box
-          sx={{
-            height: (theme) => theme.spacing(3.9),
-            width: (theme) => theme.spacing(20.9),
-          }}
-        >
+        <Box width="12vw" height="4.5vh">
           Nova coisa
         </Box>
       </Card>
       <Card>
-        <Box
-          sx={{
-            height: (theme) => theme.spacing(3.9),
-            width: (theme) => theme.spacing(20.9),
-          }}
-        >
+        <Box width="12vw" height="4.5vh">
           Nova coisa
         </Box>
       </Card>
       <Card>
-        <Box
-          sx={{
-            height: (theme) => theme.spacing(3.9),
-            width: (theme) => theme.spacing(20.9),
-          }}
-        >
+        <Box width="12vw" height="4.5vh">
           Nova coisa
         </Box>
       </Card>
@@ -178,6 +166,18 @@ export const Currently = () => {
 };
 
 /*
+
+          sx={{
+            m: theme.spacing(0, 0, 0, 5),
+            //height: (theme) => theme.spacing(3.9),
+            //width: (theme) => theme.spacing(20.9),
+          }}
+
+          sx={{
+            height: (theme) => theme.spacing(3.9),
+            width: (theme) => theme.spacing(20.9),
+          }}
+
         <Stack direction={"row"}>
           <Box width="10%" height="100%">
             <Card>qualquer coisa</Card>

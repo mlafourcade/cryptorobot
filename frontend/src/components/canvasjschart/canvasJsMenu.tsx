@@ -1,9 +1,9 @@
 import { Box, Grid } from "@mui/material";
 import { ChangeEvent, useCallback } from "react";
-import { useContextChart } from "./canvasJsWindow";
+import { useCryptoContext } from "../../contexts";
 
 export const CanvasJsMenuArea = () => {
-  const { handleSymbol, handleLimit, handleInterval } = useContextChart();
+  const { handleSymbol, handleLimit, handleInterval } = useCryptoContext();
 
   const onSymbolChange = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {

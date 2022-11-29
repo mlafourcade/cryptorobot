@@ -1,9 +1,7 @@
 import { Box, Stack } from "@mui/material";
 import { FC, ReactNode, useEffect, useState } from "react";
-import { getCandles } from "../../services/DataService";
-import { AChart } from "../apexcharts";
+import { AppCryptoProvider } from "../../contexts";
 import {
-  Canvas,
   CanvasJsMenuArea,
   CanvasJsWindowArea,
   CanvasJsWindowChartArea,
@@ -24,27 +22,29 @@ export const BodyArea: FC<NavProps> = ({ children }) => {
   return (
     <Box width="100vw" height="100vh">
       <Stack direction={"column"}>
-        <NavBarArea>Nav Bar</NavBarArea>
-        <Stack direction={"row"}>
-          <SideBarArea>Side Bar</SideBarArea>
-          <Stack direction={"column"}>
-            <MenuArea>
-              <Currently />
-            </MenuArea>
-            <Stack direction={"row"}>
-              <Stack direction={"column"}>
-                <WindowArea>
-                  <CanvasJsWindowArea>
-                    <CanvasJsMenuArea />
-                    <CanvasJsWindowChartArea />
-                  </CanvasJsWindowArea>
-                </WindowArea>
+        <AppCryptoProvider>
+          <NavBarArea>Nav Bar</NavBarArea>
+          <Stack direction={"row"}>
+            <SideBarArea>Side Bar</SideBarArea>
+            <Stack direction={"column"}>
+              <MenuArea>
+                <Currently />
+              </MenuArea>
+              <Stack direction={"row"}>
+                <Stack direction={"column"}>
+                  <WindowArea>
+                    <CanvasJsWindowArea>
+                      <CanvasJsMenuArea />
+                      <CanvasJsWindowChartArea />
+                    </CanvasJsWindowArea>
+                  </WindowArea>
+                </Stack>
+                <SubSideBarArea>Sub Side</SubSideBarArea>
               </Stack>
-              <SubSideBarArea>Sub Side</SubSideBarArea>
+              <FooterArea>Footer</FooterArea>
             </Stack>
-            <FooterArea>Footer</FooterArea>
           </Stack>
-        </Stack>
+        </AppCryptoProvider>
       </Stack>
     </Box>
   );

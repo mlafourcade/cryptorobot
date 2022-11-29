@@ -298,8 +298,8 @@ export const NebulaFighterTheme = createTheme({
       disabled: colors.alpha.black[50],
     },
     background: {
-      paper: colors.alpha.white[100],
-      default: colors.layout.general.bodyBg,
+      //paper: colors.alpha.white[100],
+      default: "#424242",
     },
     action: {
       active: colors.alpha.black[100],
