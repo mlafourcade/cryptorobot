@@ -5,6 +5,7 @@ import { AChart } from "../apexcharts";
 import useWebSocket from "react-use-websocket";
 import { Candle, DataChartArray, DataLineChart } from "./cryptos";
 import { useCryptoContext } from "../../contexts";
+import { WebSocketCreate } from "../../services/websocket";
 
 let AuxMAdataPoints: DataLineChart[] = [];
 
@@ -210,138 +211,144 @@ export const CanvasJsWindowChartArea = () => {
             .catch(() => {});
         }
 
-        const direction: number =
-          dataPointsArray.dataPoints[dataPointsArray.dataPoints.length - 1]
-            .y[3] -
-          dataPointsArray.dataPoints[dataPointsArray.dataPoints.length - 1]
-            .y[0];
+        // const direction: number =
+        //   dataPointsArray.dataPoints[dataPointsArray.dataPoints.length - 1]
+        //     .y[3] -
+        //   dataPointsArray.dataPoints[dataPointsArray.dataPoints.length - 1]
+        //     .y[0];
 
-        console.log("direction = ", direction);
+        // console.log("direction = ", direction);
 
-        if (direction < 0) {
-          console.log("direction é menor que 0");
-        } else {
-          console.log("direction é maior que 0");
-        }
+        // if (direction < 0) {
+        //   console.log("direction é menor que 0");
+        // } else {
+        //   console.log("direction é maior que 0");
+        // }
 
-        toggleColorPrice(direction < 0 ? "low" : "high");
+        //toggleColorPrice(direction < 0 ? "low" : "high");
         setData(dataPointsArray);
       })
       .catch((err) => alert(err.response ? err.response.data : err.message));
-  }, [symbol, interval, limit, colorPrice, toggleColorPrice]);
 
-  const { lastJsonMessage } = useWebSocket(
-    `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`,
-    {
-      onOpen: () => console.log(`Connected to App WS`),
-      onMessage: async () => {
-        if (lastJsonMessage) {
-          const DataBinance = lastJsonMessage as BinanceFormat;
-          const CurrentlyDate = new Date(DataBinance.k.t);
-          const newCandle = new Candle(
-            CurrentlyDate,
-            DataBinance.k.o,
-            DataBinance.k.h,
-            DataBinance.k.l,
-            DataBinance.k.c,
-            DataBinance.k.v
-          );
+    WebSocketCreate()
+      .then((res) => {
+        console.log(res);
+      })
+      .catch(() => {});
+  }, [symbol, interval, limit]);
 
-          const newDataArray: DataChartArray = {
-            dataPoints: [...data.dataPoints],
-            dataPointsBolD: [...data.dataPointsBolD],
-            dataPointsBolU: [...data.dataPointsBolU],
-            dataPointsMA: [...data.dataPointsMA],
-            dataPointsV: [...data.dataPointsV],
-          };
+  // const { lastJsonMessage } = useWebSocket(
+  //   `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`,
+  //   {
+  //     onOpen: () => console.log(`Connected to App WS`),
+  //     onMessage: async () => {
+  //       if (lastJsonMessage) {
+  //         const DataBinance = lastJsonMessage as BinanceFormat;
+  //         const CurrentlyDate = new Date(DataBinance.k.t);
+  //         const newCandle = new Candle(
+  //           CurrentlyDate,
+  //           DataBinance.k.o,
+  //           DataBinance.k.h,
+  //           DataBinance.k.l,
+  //           DataBinance.k.c,
+  //           DataBinance.k.v
+  //         );
 
-          //candle incompleto
-          if (DataBinance.k.x === false) {
-            //substitui último candle pela versão atualizada
-            newDataArray.dataPoints[newDataArray.dataPoints.length - 1] =
-              newCandle;
-            newDataArray.dataPointsV[newDataArray.dataPointsV.length - 1] = {
-              x: CurrentlyDate,
-              y: parseInt(DataBinance.k.v),
-            };
-          } else {
-            //remove primeiro candle e adiciona o novo último
-            newDataArray.dataPoints.push(newCandle);
-            newDataArray.dataPoints.shift();
-            newDataArray.dataPointsV.push({
-              x: CurrentlyDate,
-              y: parseInt(DataBinance.k.v),
-            });
-            newDataArray.dataPointsV.shift();
-          }
+  //         const newDataArray: DataChartArray = {
+  //           dataPoints: [...data.dataPoints],
+  //           dataPointsBolD: [...data.dataPointsBolD],
+  //           dataPointsBolU: [...data.dataPointsBolU],
+  //           dataPointsMA: [...data.dataPointsMA],
+  //           dataPointsV: [...data.dataPointsV],
+  //         };
 
-          AuxMAdataPoints.length = 0;
-          newDataArray.dataPointsMA.length = 0;
-          newDataArray.dataPointsBolU.length = 0;
-          newDataArray.dataPointsBolD.length = 0;
+  //         //candle incompleto
+  //         if (DataBinance.k.x === false) {
+  //           //substitui último candle pela versão atualizada
+  //           newDataArray.dataPoints[newDataArray.dataPoints.length - 1] =
+  //             newCandle;
+  //           newDataArray.dataPointsV[newDataArray.dataPointsV.length - 1] = {
+  //             x: CurrentlyDate,
+  //             y: parseInt(DataBinance.k.v),
+  //           };
+  //         } else {
+  //           //remove primeiro candle e adiciona o novo último
+  //           newDataArray.dataPoints.push(newCandle);
+  //           newDataArray.dataPoints.shift();
+  //           newDataArray.dataPointsV.push({
+  //             x: CurrentlyDate,
+  //             y: parseInt(DataBinance.k.v),
+  //           });
+  //           newDataArray.dataPointsV.shift();
+  //         }
 
-          for (let i = 0; i < newDataArray.dataPoints.length; i++) {
-            await MAcalcule(
-              newDataArray.dataPoints[i].x,
-              newDataArray.dataPoints[i].y[3],
-              i,
-              20
-            )
-              .then(async (maresult) => {
-                newDataArray.dataPointsMA.push(maresult);
-                await SDcalcule(20, maresult.y)
-                  .then(async (sdresult) => {
-                    await BollingerUpCalcule(
-                      newDataArray.dataPoints[i].x,
-                      maresult.y,
-                      sdresult
-                    )
-                      .then(async (buresult) => {
-                        newDataArray.dataPointsBolU.push(buresult);
-                      })
-                      .catch(() => {});
-                    await BollingerDownCalcule(
-                      newDataArray.dataPoints[i].x,
-                      maresult.y,
-                      sdresult
-                    )
-                      .then(async (bdresult) => {
-                        newDataArray.dataPointsBolD.push(bdresult);
-                      })
-                      .catch(() => {});
-                  })
-                  .catch(() => {});
-              })
-              .catch(() => {});
-          }
+  //         AuxMAdataPoints.length = 0;
+  //         newDataArray.dataPointsMA.length = 0;
+  //         newDataArray.dataPointsBolU.length = 0;
+  //         newDataArray.dataPointsBolD.length = 0;
 
-          console.log("Close Price = ", DataBinance.k.c);
-          console.log("Open Price = ", DataBinance.k.o);
+  //         for (let i = 0; i < newDataArray.dataPoints.length; i++) {
+  //           await MAcalcule(
+  //             newDataArray.dataPoints[i].x,
+  //             newDataArray.dataPoints[i].y[3],
+  //             i,
+  //             20
+  //           )
+  //             .then(async (maresult) => {
+  //               newDataArray.dataPointsMA.push(maresult);
+  //               await SDcalcule(20, maresult.y)
+  //                 .then(async (sdresult) => {
+  //                   await BollingerUpCalcule(
+  //                     newDataArray.dataPoints[i].x,
+  //                     maresult.y,
+  //                     sdresult
+  //                   )
+  //                     .then(async (buresult) => {
+  //                       newDataArray.dataPointsBolU.push(buresult);
+  //                     })
+  //                     .catch(() => {});
+  //                   await BollingerDownCalcule(
+  //                     newDataArray.dataPoints[i].x,
+  //                     maresult.y,
+  //                     sdresult
+  //                   )
+  //                     .then(async (bdresult) => {
+  //                       newDataArray.dataPointsBolD.push(bdresult);
+  //                     })
+  //                     .catch(() => {});
+  //                 })
+  //                 .catch(() => {});
+  //             })
+  //             .catch(() => {});
+  //         }
 
-          const direction: number =
-            parseFloat(DataBinance.k.c) - parseFloat(DataBinance.k.o);
+  //         console.log("Close Price = ", DataBinance.k.c);
+  //         console.log("Open Price = ", DataBinance.k.o);
 
-          console.log("direction = ", direction);
+  //         const direction: number =
+  //           parseFloat(DataBinance.k.c) - parseFloat(DataBinance.k.o);
 
-          if (direction < 0) {
-            console.log("direction é menor que 0");
-          } else {
-            console.log("direction é maior que 0");
-          }
+  //         console.log("direction = ", direction);
 
-          toggleColorPrice(direction < 0 ? "low" : "high");
+  //         if (direction < 0) {
+  //           console.log("direction é menor que 0");
+  //         } else {
+  //           console.log("direction é maior que 0");
+  //         }
 
-          console.log("Color Price = ", colorPrice);
+  //         toggleColorPrice(direction < 0 ? "low" : "high");
 
-          setData(newDataArray);
-          handleCrypto(parseFloat(DataBinance.k.c));
-        }
-      },
-      onError: (event: any) => console.error(event),
-      shouldReconnect: (closeEvent) => true,
-      reconnectInterval: 3000,
-    }
-  );
+  //         console.log("Color Price = ", colorPrice);
+
+  //         setData(newDataArray);
+  //         handleCrypto(parseFloat(DataBinance.k.c));
+  //       }
+  //     },
+  //     onError: (event: any) => console.error(event),
+  //     shouldReconnect: (closeEvent) => true,
+  //     reconnectInterval: 3000,
+  //   }
+  // );
 
   return (
     <Grid container height="75.4vh" width="74.9vw">
