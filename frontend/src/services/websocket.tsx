@@ -24,11 +24,9 @@ const socketMessageListener = async (event: MessageEvent<any>) => {
 
   if (myArr.k) {
     let JsonData = myArr.k;
-    console.log("JsonValue = ", JsonData);
+    console.log("JsonValue.c = ", JsonData.c);
 
     if (JsonData.i === "5m") {
-      console.log("Interval = 5m");
-
       const newCandle = new Candle(
         JsonData.t,
         JsonData.o,
@@ -71,14 +69,6 @@ function WaitforReadyState() {
 const socketOpenListener = async (event: Event) => {
   console.log("socketOpenListener");
 
-  // clearInterval(OpenInterval);
-
-  // var params;
-  // GetPartoSubscribe(CryptoCurrenceText, (ret) => {
-  //     params = ret;
-  //     //console.log("Texto Convertido = " + ret); //xlmusdt@kline_5m
-  // });
-
   await WaitforReadyState().then((res) => {
     console.log(res);
   });
@@ -88,7 +78,6 @@ const socketOpenListener = async (event: Event) => {
   var SubscribeData = {
     method: "SUBSCRIBE",
     params: ["xlmusdt@kline_5m"],
-    //params: [params],
     id: 1,
   };
 
@@ -96,62 +85,21 @@ const socketOpenListener = async (event: Event) => {
 };
 
 // Ping
-const socketPingListener = () => {
-  //WSisAlive = true;
-  //var NewTime = new Date(Date.now());
-  //LogInfo.LogText("Listener Binance Ping Received to " + NewTime);
-  //console.log("Listener Binance Ping Received to " + NewTime);
-  // clearInterval(PingInterval);
-  // PingInterval = setInterval(() => {
-  //   console.log('Estourou a contagem do Ping');
-  //   if (wss) {
-  //     SetUnsubscribe();
-  //   }
-  //   else {
-  //     console.log('wss Disable');
-  //   }
-  //   clearInterval(PingInterval);
-  //   Reconect ();
-  // }, 190000);
-  // if (wss) {
-  //   wss.pong((error) => {
-  //     console.log(error);
-  //   });
-  // }
-};
+const socketPingListener = () => {};
 
 // Error
 const socketErrorListener = (event: Event) => {
   console.log("socketErrorListener");
-
   wss.close();
 };
 
 // onopen
 const socketonopenListener = () => {
   console.log("Listener Binance onopen ");
-
-  /*var params;
-  GetPartoSubscribe(CryptoCurrenceText, (ret) => {
-    params = ret;
-    //console.log("Texto Convertido = " + ret); 
-  });
-
-  var SubscribeData = {
-    method: "SUBSCRIBE",
-    params: [params],
-    id: 1
-  }
-
-  wss.send(JSON.stringify(SubscribeData));*/
 };
 
 const socketoncloseListener = () => {
   console.log("Binance onclose ");
-
-  /*subscribed = false;*/
-
-  //socketCloseListener();
 };
 
 const socketonerrorListener = () => {
@@ -161,9 +109,6 @@ const socketonerrorListener = () => {
 // Closeds
 const socketCloseListener = (event: CloseEvent) => {
   console.log("Disconnected");
-  // if (StreamEvent) {
-  //   Reconect ();
-  // }
 };
 
 // const { lastJsonMessage } = useWebSocket(

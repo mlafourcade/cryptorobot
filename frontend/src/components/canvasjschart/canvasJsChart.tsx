@@ -160,6 +160,7 @@ export const CanvasJsWindowChartArea = () => {
     toggleColorPrice,
   } = useCryptoContext();
   const [data, setData] = useState(initialDataState);
+  const [chartUpdate, setchartUpdate] = useState(0);
 
   useEffect(() => {
     getCandles(symbol, interval, limit)
@@ -211,21 +212,6 @@ export const CanvasJsWindowChartArea = () => {
             .catch(() => {});
         }
 
-        // const direction: number =
-        //   dataPointsArray.dataPoints[dataPointsArray.dataPoints.length - 1]
-        //     .y[3] -
-        //   dataPointsArray.dataPoints[dataPointsArray.dataPoints.length - 1]
-        //     .y[0];
-
-        // console.log("direction = ", direction);
-
-        // if (direction < 0) {
-        //   console.log("direction é menor que 0");
-        // } else {
-        //   console.log("direction é maior que 0");
-        // }
-
-        //toggleColorPrice(direction < 0 ? "low" : "high");
         setData(dataPointsArray);
       })
       .catch((err) => alert(err.response ? err.response.data : err.message));
@@ -235,120 +221,112 @@ export const CanvasJsWindowChartArea = () => {
         console.log(res);
       })
       .catch(() => {});
-  }, [symbol, interval, limit]);
+  }, [symbol, interval, limit, chartUpdate]);
 
-  // const { lastJsonMessage } = useWebSocket(
-  //   `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`,
-  //   {
-  //     onOpen: () => console.log(`Connected to App WS`),
-  //     onMessage: async () => {
-  //       if (lastJsonMessage) {
-  //         const DataBinance = lastJsonMessage as BinanceFormat;
-  //         const CurrentlyDate = new Date(DataBinance.k.t);
-  //         const newCandle = new Candle(
-  //           CurrentlyDate,
-  //           DataBinance.k.o,
-  //           DataBinance.k.h,
-  //           DataBinance.k.l,
-  //           DataBinance.k.c,
-  //           DataBinance.k.v
-  //         );
+  const { lastJsonMessage } = useWebSocket(
+    `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`,
+    {
+      onOpen: () => console.log(`Connected to App WS`),
+      onMessage: async () => {
+        if (lastJsonMessage) {
+          const DataBinance = lastJsonMessage as BinanceFormat;
+          const CurrentlyDate = new Date(DataBinance.k.t);
 
-  //         const newDataArray: DataChartArray = {
-  //           dataPoints: [...data.dataPoints],
-  //           dataPointsBolD: [...data.dataPointsBolD],
-  //           dataPointsBolU: [...data.dataPointsBolU],
-  //           dataPointsMA: [...data.dataPointsMA],
-  //           dataPointsV: [...data.dataPointsV],
-  //         };
+          console.log("DataBinance.k.c = ", DataBinance.k.c);
 
-  //         //candle incompleto
-  //         if (DataBinance.k.x === false) {
-  //           //substitui último candle pela versão atualizada
-  //           newDataArray.dataPoints[newDataArray.dataPoints.length - 1] =
-  //             newCandle;
-  //           newDataArray.dataPointsV[newDataArray.dataPointsV.length - 1] = {
-  //             x: CurrentlyDate,
-  //             y: parseInt(DataBinance.k.v),
-  //           };
-  //         } else {
-  //           //remove primeiro candle e adiciona o novo último
-  //           newDataArray.dataPoints.push(newCandle);
-  //           newDataArray.dataPoints.shift();
-  //           newDataArray.dataPointsV.push({
-  //             x: CurrentlyDate,
-  //             y: parseInt(DataBinance.k.v),
-  //           });
-  //           newDataArray.dataPointsV.shift();
-  //         }
+          const direction: number =
+            parseFloat(DataBinance.k.c) - parseFloat(DataBinance.k.o);
+          toggleColorPrice(direction < 0 ? "low" : "high");
 
-  //         AuxMAdataPoints.length = 0;
-  //         newDataArray.dataPointsMA.length = 0;
-  //         newDataArray.dataPointsBolU.length = 0;
-  //         newDataArray.dataPointsBolD.length = 0;
+          const newCandle = new Candle(
+            CurrentlyDate,
+            DataBinance.k.o,
+            DataBinance.k.h,
+            DataBinance.k.l,
+            DataBinance.k.c,
+            DataBinance.k.v
+          );
 
-  //         for (let i = 0; i < newDataArray.dataPoints.length; i++) {
-  //           await MAcalcule(
-  //             newDataArray.dataPoints[i].x,
-  //             newDataArray.dataPoints[i].y[3],
-  //             i,
-  //             20
-  //           )
-  //             .then(async (maresult) => {
-  //               newDataArray.dataPointsMA.push(maresult);
-  //               await SDcalcule(20, maresult.y)
-  //                 .then(async (sdresult) => {
-  //                   await BollingerUpCalcule(
-  //                     newDataArray.dataPoints[i].x,
-  //                     maresult.y,
-  //                     sdresult
-  //                   )
-  //                     .then(async (buresult) => {
-  //                       newDataArray.dataPointsBolU.push(buresult);
-  //                     })
-  //                     .catch(() => {});
-  //                   await BollingerDownCalcule(
-  //                     newDataArray.dataPoints[i].x,
-  //                     maresult.y,
-  //                     sdresult
-  //                   )
-  //                     .then(async (bdresult) => {
-  //                       newDataArray.dataPointsBolD.push(bdresult);
-  //                     })
-  //                     .catch(() => {});
-  //                 })
-  //                 .catch(() => {});
-  //             })
-  //             .catch(() => {});
-  //         }
+          const newDataArray: DataChartArray = {
+            dataPoints: [...data.dataPoints],
+            dataPointsBolD: [...data.dataPointsBolD],
+            dataPointsBolU: [...data.dataPointsBolU],
+            dataPointsMA: [...data.dataPointsMA],
+            dataPointsV: [...data.dataPointsV],
+          };
 
-  //         console.log("Close Price = ", DataBinance.k.c);
-  //         console.log("Open Price = ", DataBinance.k.o);
+          //candle incompleto
+          if (DataBinance.k.x === false) {
+            //substitui último candle pela versão atualizada
+            newDataArray.dataPoints[newDataArray.dataPoints.length - 1] =
+              newCandle;
+            newDataArray.dataPointsV[newDataArray.dataPointsV.length - 1] = {
+              x: CurrentlyDate,
+              y: parseInt(DataBinance.k.v),
+            };
+          } else {
+            //remove primeiro candle e adiciona o novo último
+            newDataArray.dataPoints.push(newCandle);
+            newDataArray.dataPoints.shift();
+            newDataArray.dataPointsV.push({
+              x: CurrentlyDate,
+              y: parseInt(DataBinance.k.v),
+            });
+            newDataArray.dataPointsV.shift();
 
-  //         const direction: number =
-  //           parseFloat(DataBinance.k.c) - parseFloat(DataBinance.k.o);
+            const dataupdate = chartUpdate + 1;
+            setchartUpdate(dataupdate);
+          }
 
-  //         console.log("direction = ", direction);
+          AuxMAdataPoints.length = 0;
+          newDataArray.dataPointsMA.length = 0;
+          newDataArray.dataPointsBolU.length = 0;
+          newDataArray.dataPointsBolD.length = 0;
 
-  //         if (direction < 0) {
-  //           console.log("direction é menor que 0");
-  //         } else {
-  //           console.log("direction é maior que 0");
-  //         }
+          for (let i = 0; i < newDataArray.dataPoints.length; i++) {
+            await MAcalcule(
+              newDataArray.dataPoints[i].x,
+              newDataArray.dataPoints[i].y[3],
+              i,
+              20
+            )
+              .then(async (maresult) => {
+                newDataArray.dataPointsMA.push(maresult);
+                await SDcalcule(20, maresult.y)
+                  .then(async (sdresult) => {
+                    await BollingerUpCalcule(
+                      newDataArray.dataPoints[i].x,
+                      maresult.y,
+                      sdresult
+                    )
+                      .then(async (buresult) => {
+                        newDataArray.dataPointsBolU.push(buresult);
+                      })
+                      .catch(() => {});
+                    await BollingerDownCalcule(
+                      newDataArray.dataPoints[i].x,
+                      maresult.y,
+                      sdresult
+                    )
+                      .then(async (bdresult) => {
+                        newDataArray.dataPointsBolD.push(bdresult);
+                      })
+                      .catch(() => {});
+                  })
+                  .catch(() => {});
+              })
+              .catch(() => {});
+          }
 
-  //         toggleColorPrice(direction < 0 ? "low" : "high");
-
-  //         console.log("Color Price = ", colorPrice);
-
-  //         setData(newDataArray);
-  //         handleCrypto(parseFloat(DataBinance.k.c));
-  //       }
-  //     },
-  //     onError: (event: any) => console.error(event),
-  //     shouldReconnect: (closeEvent) => true,
-  //     reconnectInterval: 3000,
-  //   }
-  // );
+          setData(newDataArray);
+          handleCrypto(parseFloat(DataBinance.k.c));
+        }
+      },
+      onError: (event: any) => console.error(event),
+      shouldReconnect: (closeEvent) => true,
+      reconnectInterval: 3000,
+    }
+  );
 
   return (
     <Grid container height="75.4vh" width="74.9vw">
