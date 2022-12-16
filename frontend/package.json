@@ -33,6 +33,9 @@
   },
   "scripts": {
     "start": "set PORT=3002 && react-scripts start",
+    "run-dev": "nodemon --exec npm start",
+    "watch": "tsc -w --preserveWatchOutput ",
+    "dev": "concurrently \"npm:watch\" \"npm:run-dev\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -56,6 +59,8 @@
     ]
   },
   "devDependencies": {
-    "@types/material-ui": "^0.21.12"
+    "@types/material-ui": "^0.21.12",
+    "concurrently": "^7.6.0",
+    "nodemon": "^2.0.20"
   }
 }

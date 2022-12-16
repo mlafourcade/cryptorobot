@@ -7,6 +7,8 @@ import { Candle, DataChartArray, DataLineChart } from "./cryptos";
 import { useCryptoContext } from "../../contexts";
 import { WebSocketCreate } from "../../services/websocket";
 
+let ws: WebSocket;
+
 let AuxMAdataPoints: DataLineChart[] = [];
 
 async function delayMA(time: number) {
@@ -160,7 +162,7 @@ export const CanvasJsWindowChartArea = () => {
     toggleColorPrice,
   } = useCryptoContext();
   const [data, setData] = useState(initialDataState);
-  const [chartUpdate, setchartUpdate] = useState(0);
+  //const [chartUpdate, setchartUpdate] = useState(0);
 
   useEffect(() => {
     getCandles(symbol, interval, limit)
@@ -221,7 +223,94 @@ export const CanvasJsWindowChartArea = () => {
         console.log(res);
       })
       .catch(() => {});
-  }, [symbol, interval, limit, chartUpdate]);
+
+    WebSocketInit()
+      .then((res) => {
+        console.log(res);
+      })
+      .catch(() => {});
+  }, [symbol, interval, limit]);
+
+  function WebSocketInit() {
+    return new Promise((resolve, reject) => {
+      ws = new WebSocket("wss://stream.binance.com:9443/ws");
+
+      ws.addEventListener("open", socketOpenListener);
+      ws.addEventListener("message", socketMessageListener);
+      ws.addEventListener("close", socketCloseListener);
+      ws.addEventListener("ping", socketPingListener);
+      ws.addEventListener("error", socketErrorListener);
+      ws.addEventListener("onopen", socketonopenListener);
+      ws.addEventListener("onclose", socketoncloseListener);
+      ws.addEventListener("onerror", socketonerrorListener);
+
+      resolve("Loaded Websocket List");
+    });
+  }
+
+  const socketMessageListener = async (event: MessageEvent<any>) => {
+    let myArr = JSON.parse(event.data);
+
+    if (myArr.k) {
+      let JsonData = myArr.k;
+      console.log("Inside JsonValue.c = ", JsonData.c);
+
+      if (JsonData.i === "5m") {
+        const newCandle = new Candle(
+          JsonData.t,
+          JsonData.o,
+          JsonData.h,
+          JsonData.l,
+          JsonData.c,
+          JsonData.v
+        );
+      } else if (myArr.result === null) {
+        console.log("Inside JsonValue = ", myArr.result);
+      } else {
+        console.log("sei la = ", myArr);
+      }
+    }
+  };
+
+  function WaitforReadyState() {
+    return new Promise((resolve, reject) => {
+      if (ws.readyState === 1) resolve("wss.readyState ok");
+    });
+  }
+
+  const socketOpenListener = async (event: Event) => {
+    console.log("socketOpenListener");
+
+    await WaitforReadyState().then((res) => {
+      console.log(res);
+    });
+
+    console.log("Set Inside SUBSCRIBE");
+
+    var SubscribeData = {
+      method: "SUBSCRIBE",
+      params: ["xlmusdt@kline_5m"],
+      id: 1,
+    };
+
+    ws.send(JSON.stringify(SubscribeData));
+  };
+  const socketPingListener = () => {};
+  const socketErrorListener = (event: Event) => {
+    console.log("socketErrorListener");
+  };
+  const socketonopenListener = () => {
+    console.log("Listener Binance onopen ");
+  };
+  const socketoncloseListener = () => {
+    console.log("Binance onclose ");
+  };
+  const socketonerrorListener = () => {
+    console.log("socketonerrorListener ");
+  };
+  const socketCloseListener = (event: CloseEvent) => {
+    console.log("Disconnected");
+  };
 
   const { lastJsonMessage } = useWebSocket(
     `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`,
@@ -274,8 +363,8 @@ export const CanvasJsWindowChartArea = () => {
             });
             newDataArray.dataPointsV.shift();
 
-            const dataupdate = chartUpdate + 1;
-            setchartUpdate(dataupdate);
+            //const dataupdate = chartUpdate + 1;
+            //setchartUpdate(dataupdate);
           }
 
           AuxMAdataPoints.length = 0;

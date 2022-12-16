@@ -7,6 +7,7 @@ import {
   CanvasJsWindowChartArea,
 } from "../canvasjschart";
 import { Currently } from "../Cards/currently";
+import { Trade } from "../trade";
 import { FooterArea } from "../Template/footer";
 import { MenuArea } from "../Template/menu";
 import { NavBarArea } from "../Template/navbar";
@@ -25,7 +26,9 @@ export const BodyArea: FC<NavProps> = ({ children }) => {
         <AppCryptoProvider>
           <NavBarArea>Nav Bar</NavBarArea>
           <Stack direction={"row"}>
-            <SideBarArea>Side Bar</SideBarArea>
+            <SideBarArea>
+              <Trade />
+            </SideBarArea>
             <Stack direction={"column"}>
               <MenuArea>
                 <Currently />
