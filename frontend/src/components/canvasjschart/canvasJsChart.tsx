@@ -5,11 +5,11 @@ import { AChart } from "../apexcharts";
 import useWebSocket from "react-use-websocket";
 import { Candle, DataChartArray, DataLineChart } from "./cryptos";
 import { useCryptoContext } from "../../contexts";
-import { WebSocketCreate } from "../../services/websocket";
 
 let ws: WebSocket;
 
 let AuxMAdataPoints: DataLineChart[] = [];
+let update: number = 0;
 
 async function delayMA(time: number) {
   return new Promise((resolve, reject) => {
@@ -153,18 +153,13 @@ const initialDataState: DataChartArray = {
 };
 
 export const CanvasJsWindowChartArea = () => {
-  const {
-    symbol,
-    interval,
-    limit,
-    colorPrice,
-    handleCrypto,
-    toggleColorPrice,
-  } = useCryptoContext();
+  const { symbol, interval, limit, handleCrypto, toggleColorPrice } =
+    useCryptoContext();
   const [data, setData] = useState(initialDataState);
-  //const [chartUpdate, setchartUpdate] = useState(0);
+  const [chartUpdate, setchartUpdate] = useState(0);
 
   useEffect(() => {
+    console.log("Load New Chart instance");
     getCandles(symbol, interval, limit)
       .then(async (value: any) => {
         const dataPointsArray: DataChartArray = {
@@ -213,61 +208,135 @@ export const CanvasJsWindowChartArea = () => {
             })
             .catch(() => {});
         }
-
         setData(dataPointsArray);
       })
       .catch((err) => alert(err.response ? err.response.data : err.message));
+  }, [symbol, interval, limit, chartUpdate]);
 
-    WebSocketCreate()
-      .then((res) => {
-        console.log(res);
-      })
-      .catch(() => {});
-
+  useEffect(() => {
     WebSocketInit()
       .then((res) => {
+        console.log("WebSocket update === ", update);
+        setchartUpdate(update++);
+
         console.log(res);
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.log(err);
+      });
   }, [symbol, interval, limit]);
 
-  function WebSocketInit() {
+  const WebSocketInit = () => {
     return new Promise((resolve, reject) => {
-      ws = new WebSocket("wss://stream.binance.com:9443/ws");
+      if (ws) {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close();
+        } else {
+          console.log("readyState = ", ws.readyState);
+        }
+        reject("websocket error");
+      } else {
+        ws = new WebSocket("wss://stream.binance.com:9443/ws");
 
-      ws.addEventListener("open", socketOpenListener);
-      ws.addEventListener("message", socketMessageListener);
-      ws.addEventListener("close", socketCloseListener);
-      ws.addEventListener("ping", socketPingListener);
-      ws.addEventListener("error", socketErrorListener);
-      ws.addEventListener("onopen", socketonopenListener);
-      ws.addEventListener("onclose", socketoncloseListener);
-      ws.addEventListener("onerror", socketonerrorListener);
-
-      resolve("Loaded Websocket List");
+        ws.addEventListener("open", socketOpenListener);
+        ws.addEventListener("message", socketMessageListener);
+        ws.addEventListener("close", socketCloseListener);
+        ws.addEventListener("ping", socketPingListener);
+        ws.addEventListener("error", socketErrorListener);
+        ws.addEventListener("onopen", socketonopenListener);
+        ws.addEventListener("onclose", socketoncloseListener);
+        ws.addEventListener("onerror", socketonerrorListener);
+        resolve("Loaded Websocket List");
+      }
     });
-  }
+  };
 
   const socketMessageListener = async (event: MessageEvent<any>) => {
     let myArr = JSON.parse(event.data);
 
     if (myArr.k) {
-      let JsonData = myArr.k;
-      console.log("Inside JsonValue.c = ", JsonData.c);
-
-      if (JsonData.i === "5m") {
-        const newCandle = new Candle(
-          JsonData.t,
-          JsonData.o,
-          JsonData.h,
-          JsonData.l,
-          JsonData.c,
-          JsonData.v
-        );
-      } else if (myArr.result === null) {
-        console.log("Inside JsonValue = ", myArr.result);
+      if (myArr.k.x === true) {
+        console.log("update === ", update);
+        setchartUpdate(update++);
       } else {
-        console.log("sei la = ", myArr);
+        let JsonData = myArr.k;
+        console.log("Inside JsonValue.c = ", JsonData.c);
+        const CurrentlyDate = new Date(myArr.k.t);
+
+        if (JsonData.i === "5m") {
+          const newCandle = new Candle(
+            CurrentlyDate,
+            JsonData.o,
+            JsonData.h,
+            JsonData.l,
+            JsonData.c,
+            JsonData.v
+          );
+
+          const newDataArray: DataChartArray = {
+            dataPoints: [...data.dataPoints],
+            dataPointsBolD: [...data.dataPointsBolD],
+            dataPointsBolU: [...data.dataPointsBolU],
+            dataPointsMA: [...data.dataPointsMA],
+            dataPointsV: [...data.dataPointsV],
+          };
+
+          // //substitui último candle pela versão atualizada
+          // newDataArray.dataPoints[newDataArray.dataPoints.length - 1] =
+          //   newCandle;
+          // newDataArray.dataPointsV[newDataArray.dataPointsV.length - 1] = {
+          //   x: CurrentlyDate,
+          //   y: parseInt(myArr.k.v),
+          // };
+          // newDataArray.dataPointsV.shift();
+
+          // AuxMAdataPoints.length = 0;
+          // newDataArray.dataPointsMA.length = 0;
+          // newDataArray.dataPointsBolU.length = 0;
+          // newDataArray.dataPointsBolD.length = 0;
+
+          // for (let i = 0; i < newDataArray.dataPoints.length; i++) {
+          //   await MAcalcule(
+          //     newDataArray.dataPoints[i].x,
+          //     newDataArray.dataPoints[i].y[3],
+          //     i,
+          //     20
+          //   )
+          //     .then(async (maresult) => {
+          //       newDataArray.dataPointsMA.push(maresult);
+          //       await SDcalcule(20, maresult.y)
+          //         .then(async (sdresult) => {
+          //           await BollingerUpCalcule(
+          //             newDataArray.dataPoints[i].x,
+          //             maresult.y,
+          //             sdresult
+          //           )
+          //             .then(async (buresult) => {
+          //               newDataArray.dataPointsBolU.push(buresult);
+          //             })
+          //             .catch(() => {});
+          //           await BollingerDownCalcule(
+          //             newDataArray.dataPoints[i].x,
+          //             maresult.y,
+          //             sdresult
+          //           )
+          //             .then(async (bdresult) => {
+          //               newDataArray.dataPointsBolD.push(bdresult);
+          //             })
+          //             .catch(() => {});
+          //         })
+          //         .catch(() => {});
+          //     })
+          //     .catch(() => {});
+          // }
+
+          // setData(newDataArray);
+          handleCrypto(parseFloat(JsonData.c));
+        } else if (myArr.result === null) {
+          console.log("Inside JsonValue = ", myArr.result);
+        } else {
+          console.log("sei la = ", myArr);
+        }
       }
     }
   };
@@ -362,50 +431,47 @@ export const CanvasJsWindowChartArea = () => {
               y: parseInt(DataBinance.k.v),
             });
             newDataArray.dataPointsV.shift();
-
-            //const dataupdate = chartUpdate + 1;
-            //setchartUpdate(dataupdate);
           }
 
-          AuxMAdataPoints.length = 0;
-          newDataArray.dataPointsMA.length = 0;
-          newDataArray.dataPointsBolU.length = 0;
-          newDataArray.dataPointsBolD.length = 0;
+          // AuxMAdataPoints.length = 0;
+          // newDataArray.dataPointsMA.length = 0;
+          // newDataArray.dataPointsBolU.length = 0;
+          // newDataArray.dataPointsBolD.length = 0;
 
-          for (let i = 0; i < newDataArray.dataPoints.length; i++) {
-            await MAcalcule(
-              newDataArray.dataPoints[i].x,
-              newDataArray.dataPoints[i].y[3],
-              i,
-              20
-            )
-              .then(async (maresult) => {
-                newDataArray.dataPointsMA.push(maresult);
-                await SDcalcule(20, maresult.y)
-                  .then(async (sdresult) => {
-                    await BollingerUpCalcule(
-                      newDataArray.dataPoints[i].x,
-                      maresult.y,
-                      sdresult
-                    )
-                      .then(async (buresult) => {
-                        newDataArray.dataPointsBolU.push(buresult);
-                      })
-                      .catch(() => {});
-                    await BollingerDownCalcule(
-                      newDataArray.dataPoints[i].x,
-                      maresult.y,
-                      sdresult
-                    )
-                      .then(async (bdresult) => {
-                        newDataArray.dataPointsBolD.push(bdresult);
-                      })
-                      .catch(() => {});
-                  })
-                  .catch(() => {});
-              })
-              .catch(() => {});
-          }
+          // for (let i = 0; i < newDataArray.dataPoints.length; i++) {
+          //   await MAcalcule(
+          //     newDataArray.dataPoints[i].x,
+          //     newDataArray.dataPoints[i].y[3],
+          //     i,
+          //     20
+          //   )
+          //     .then(async (maresult) => {
+          //       newDataArray.dataPointsMA.push(maresult);
+          //       await SDcalcule(20, maresult.y)
+          //         .then(async (sdresult) => {
+          //           await BollingerUpCalcule(
+          //             newDataArray.dataPoints[i].x,
+          //             maresult.y,
+          //             sdresult
+          //           )
+          //             .then(async (buresult) => {
+          //               newDataArray.dataPointsBolU.push(buresult);
+          //             })
+          //             .catch(() => {});
+          //           await BollingerDownCalcule(
+          //             newDataArray.dataPoints[i].x,
+          //             maresult.y,
+          //             sdresult
+          //           )
+          //             .then(async (bdresult) => {
+          //               newDataArray.dataPointsBolD.push(bdresult);
+          //             })
+          //             .catch(() => {});
+          //         })
+          //         .catch(() => {});
+          //     })
+          //     .catch(() => {});
+          // }
 
           setData(newDataArray);
           handleCrypto(parseFloat(DataBinance.k.c));

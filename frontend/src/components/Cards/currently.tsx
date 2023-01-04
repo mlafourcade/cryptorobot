@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { BarTypography, BarBox, FormPrefix } from "../../myDesign";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -18,6 +19,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useCryptoContext } from "../../contexts";
+import { CardFormTex, FormTextPrefix } from "../../myDesign/textFieldsDesign";
 
 type Locale = {
   code?: string;
@@ -97,24 +99,9 @@ const LinearProgressWrapper = styled(LinearProgress)(
 `
 );
 
-// "Offline since " +
-// formatDistance(subDays(new Date(), 14), new Date(), {
-//   addSuffix: true,
-// })
-
-//<Text color="black">4</Text> out of <Text color="black">6</Text>
-
 export const Currently = () => {
   const theme = useTheme();
-  const { crypto, symbol, colorPrice, handleCrypto } = useCryptoContext();
-
-  const MyTypography = styled(Typography)({
-    color:
-      colorPrice === "high" ? theme.colors.high.main : theme.colors.low.main,
-    textAlign: "center",
-    fontSize: "0.875rem",
-    fontWeight: "700",
-  });
+  const { crypto, symbol, colorPrice } = useCryptoContext();
 
   return (
     <Stack
@@ -124,82 +111,45 @@ export const Currently = () => {
       sx={{ gap: "0.4%", p: "0.4%", boxShadow: 4, background: "#424242" }}
     >
       <Card>
-        <Box
-          width="12vw"
-          height="4.5vh"
-          //style={{ background: `${theme.colors.success.main}` }}
-          style={{ background: "darkCard" }}
-          sx={{
-            boxShadow: 30,
-          }}
-        >
-          <Typography
-            sx={{
-              mb: 1.5,
-              textAlign: "center",
-              fontSize: "0.875rem",
-              fontWeight: "700",
-              color:
-                colorPrice === "high"
-                  ? theme.colors.high.main
-                  : theme.colors.low.main,
-            }}
-            color="success"
-          >
+        <BarBox>
+          <BarTypography theme={theme} color={colorPrice}>
             {symbol + " = " + crypto}
-          </Typography>
-        </Box>
+          </BarTypography>
+        </BarBox>
       </Card>
       <Card>
-        <Box width="12vw" height="4.5vh">
-          <MyTypography>{symbol + " = " + colorPrice}</MyTypography>
-        </Box>
+        <BarBox>
+          <BarTypography theme={theme} color={colorPrice}>
+            {symbol + " = " + colorPrice}
+          </BarTypography>
+        </BarBox>
       </Card>
       <Card>
-        <Box width="12vw" height="4.5vh" color="theme.colors.success.main">
-          <Typography
-            sx={{
-              mb: 1.5,
-              textAlign: "center",
-              fontSize: "0.875rem",
-              fontWeight: "700",
-              color: theme.colors.success.main,
-              background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
-              border: 0,
-              borderRadius: 3,
-              boxShadow: "0 3px 5px 2px rgba(255, 105, 135, .3)",
-              padding: "0 30px",
-            }}
-          >
+        <BarBox>
+          <BarTypography theme={theme} color={colorPrice}>
             Nova coisa
-          </Typography>
-        </Box>
+          </BarTypography>
+        </BarBox>
       </Card>
       <Card>
-        <Box width="12vw" height="4.5vh">
-          Nova coisa
-        </Box>
-      </Card>
-      <Card>
-        <Box width="12vw" height="4.5vh">
-          <Typography
-            sx={{
-              mb: 1.5,
-              textAlign: "center",
-              fontSize: "0.875rem",
-              fontWeight: "700",
-              color: "high",
-            }}
-          >
+        <BarBox>
+          <BarTypography theme={theme} color={colorPrice}>
             Nova coisa
-          </Typography>
-        </Box>
+          </BarTypography>
+        </BarBox>
       </Card>
+
       <Card>
-        <Box width="12vw" height="4.5vh">
-          Nova coisa
-        </Box>
+        <CardFormTex>0.00000</CardFormTex>
       </Card>
+      <FormTextPrefix>0.00000</FormTextPrefix>
+      {/* <Card>
+        <BarBox>
+          <BarTypography theme={theme} color={colorPrice}>
+            Nova coisa
+          </BarTypography>
+        </BarBox>
+      </Card> */}
     </Stack>
   );
 };
